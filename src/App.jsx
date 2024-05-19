@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
+import NotificationMessage from './components/NotificationMessage'
 import BlogCreateForm from './components/BlogCreateForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [typeMessage, setTypeMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -37,23 +40,26 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+      notificationMessage('Successfully logged in!', 'success')
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000);
+      notificationMessage('Wrong credentials', 'error')
     }
   }
 
   const addBlog = async (formData) => {
     try {
       const returnedBlog = await blogService.create(formData)
-      // notificationMessage(`Added ${returnedBlog.content}`, 'success')
       setBlogs(blogs.concat(returnedBlog))
+      notificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`, 'success')
     } catch (error) {
-      console.log(`Blog '${formData.title}' was not created`)
-      // notificationMessage(`Blog '${formData.title}' was not created`, 'error')
+      notificationMessage(`Blog '${formData.title}' was not created`, 'error')
     }
+  }
+
+  const notificationMessage = (message, type) => {
+    setTypeMessage(type)
+    setErrorMessage(message)
+    setTimeout(() => setErrorMessage(null), 5000)
   }
 
   const handleLogout = () => {
@@ -63,7 +69,8 @@ const App = () => {
 
   return (
     <div>
-       {user === null ?
+      <NotificationMessage message={errorMessage} typeMessage={typeMessage} />
+      {user === null ?
         <Login 
           password={password}
           username={username}
@@ -79,7 +86,7 @@ const App = () => {
           >Logout</button>
         </div>
       }
-      <h2>blogs</h2>
+      <h1>blogs</h1>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
