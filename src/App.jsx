@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
+import BlogCreateForm from './components/BlogCreateForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [newBlog, setNewBlog] = useState({})
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
@@ -19,13 +19,13 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      const loggedUser = JSON.parse(loggedUserJSON)
-      setUser(loggedUser)
-      blogService.setToken(loggedUser.token)
-    }
-  }, [])//The empty array as the parameter of the effect ensures that the effect is executed only when the component is rendered for the first time.
+  const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+  if (loggedUserJSON) {
+    const loggedUser = JSON.parse(loggedUserJSON)
+    setUser(loggedUser)
+    blogService.setToken(loggedUser.token)
+  }
+}, []) // This effect runs only once after the initial render, setting up the user from local storage if available.
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -45,6 +45,22 @@ const App = () => {
     }
   }
 
+  const addBlog = async (formData) => {
+    try {
+      const returnedBlog = await blogService.create(formData)
+      // notificationMessage(`Added ${returnedBlog.content}`, 'success')
+      setBlogs(blogs.concat(returnedBlog))
+    } catch (error) {
+      console.log(`Blog '${formData.title}' was not created`)
+      // notificationMessage(`Blog '${formData.title}' was not created`, 'error')
+    }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+  }
+
   return (
     <div>
        {user === null ?
@@ -57,12 +73,9 @@ const App = () => {
         /> :
         <div>
           <p>{user.name} logged-in</p>
-          <button onClick={
-              () => {
-                window.localStorage.removeItem('loggedBlogappUser')
-                setUser(null)
-              }
-            }
+          <h2>Create blog</h2>
+          <BlogCreateForm addNewBlog={addBlog} />
+          <button onClick={handleLogout}
           >Logout</button>
         </div>
       }
