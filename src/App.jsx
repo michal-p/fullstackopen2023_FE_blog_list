@@ -20,18 +20,23 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs(blogs.sort((a, b) => b.likes - a.likes))
     )  
   }, [])
 
   useEffect(() => {
-  const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-  if (loggedUserJSON) {
-    const loggedUser = JSON.parse(loggedUserJSON)
-    setUser(loggedUser)
-    blogService.setToken(loggedUser.token)
-  }
-}, []) // This effect runs only once after the initial render, setting up the user from local storage if available.
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    if (loggedUserJSON) {
+      const loggedUser = JSON.parse(loggedUserJSON)
+      setUser(loggedUser)
+      blogService.setToken(loggedUser.token)
+    }
+  }, []) // This effect runs only once after the initial render, setting up the user from local storage if available.
+
+  useEffect(() => {
+    setBlogs(blogs.sort((a, b) => b.likes - a.likes))
+  }, [blogs])
+  
 
   const handleLogin = async (event) => {
     event.preventDefault()
