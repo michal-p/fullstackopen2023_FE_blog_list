@@ -45,7 +45,7 @@ const App = () => {
       setPassword('')
       notificationMessage('Successfully logged in!', 'success')
     } catch (exception) {
-      notificationMessage('Wrong credentials', 'error')
+      notificationMessage('Wrong credentials!', 'error')
     }
   }
 
@@ -55,7 +55,7 @@ const App = () => {
       setBlogs(blogs.concat(returnedBlog))
       notificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`, 'success')
     } catch (error) {
-      notificationMessage(`Blog '${formData.title}' was not created`, 'error')
+      notificationMessage(`Blog '${formData.title}' was not created!`, 'error')
     }
   }
 
@@ -68,6 +68,17 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogAppUser')
     setUser(null)
+  }
+
+  const blogUpdate = async (updatedBlog) => {
+    try {
+      const { user, ...blogData } = updatedBlog; // Destructure user object and keep only blog data
+      const respondedBlog = await blogService.update(blogData.id, blogData)
+      setBlogs(blogs.map(b => b.id !== respondedBlog.id ? b : respondedBlog))
+      notificationMessage(`A new blog ${respondedBlog.title} by ${respondedBlog.author} updated!`, 'success')
+    } catch (error) {
+      notificationMessage(`Blog '${blogData.title}' was not updated!`, 'error')
+    }
   }
 
   return (
@@ -91,7 +102,7 @@ const App = () => {
         </div>
       }
       <h1>blogs</h1>
-      { blogs.map(blog => <Blog key={ blog.id } blog={ blog } />) }
+      { blogs.map(blog => <Blog key={ blog.id } blog={ blog } blogUpdate={ blogUpdate }/>) }
     </div>
   )
 }
