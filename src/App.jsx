@@ -74,10 +74,10 @@ const App = () => {
     try {
       const { user, ...blogData } = updatedBlog; // Destructure user object and keep only blog data
       const respondedBlog = await blogService.update(blogData.id, blogData)
-      setBlogs(blogs.map(b => b.id !== respondedBlog.id ? b : respondedBlog))
-      notificationMessage(`A new blog ${respondedBlog.title} by ${respondedBlog.author} updated!`, 'success')
+      setBlogs(blogs.map(b => b.id !== respondedBlog.id ? b : { ...respondedBlog, user }))//TODO! here we can return user object from server by populate method in blogs.put method 
+      notificationMessage(`A new blog ${ respondedBlog.title } by ${ respondedBlog.author } updated!`, 'success')
     } catch (error) {
-      notificationMessage(`Blog '${blogData.title}' was not updated!`, 'error')
+      notificationMessage(`Blog '${ blogData.title }' was not updated!`, 'error')
     }
   }
 
