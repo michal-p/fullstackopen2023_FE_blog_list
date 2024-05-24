@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Login from './components/Login'
 import NotificationMessage from './components/NotificationMessage'
 import BlogCreateForm from './components/BlogCreateForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
@@ -15,6 +16,8 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [typeMessage, setTypeMessage] = useState(null)
 
+  const blogFormRef = useRef(null)
+
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
@@ -22,7 +25,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-  const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+  const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
   if (loggedUserJSON) {
     const loggedUser = JSON.parse(loggedUserJSON)
     setUser(loggedUser)
@@ -35,7 +38,7 @@ const App = () => {
 
     try {
       const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user)) 
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user)) 
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -63,7 +66,7 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
+    window.localStorage.removeItem('loggedBlogAppUser')
     setUser(null)
   }
 
@@ -80,10 +83,11 @@ const App = () => {
         /> :
         <div>
           <p>{user.name} logged-in</p>
+          <button onClick={handleLogout}>Logout</button>
           <h2>Create blog</h2>
-          <BlogCreateForm addNewBlog={addBlog} />
-          <button onClick={handleLogout}
-          >Logout</button>
+          <Togglable buttonLabel='Create blog' ref={blogFormRef}>
+            <BlogCreateForm addNewBlog={addBlog} />
+          </Togglable>
         </div>
       }
       <h1>blogs</h1>
