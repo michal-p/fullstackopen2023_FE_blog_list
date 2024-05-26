@@ -32,12 +32,7 @@ const App = () => {
       blogService.setToken(loggedUser.token)
     }
   }, []) // This effect runs only once after the initial render, setting up the user from local storage if available.
-
-  useEffect(() => {
-    setBlogs(blogs.sort((a, b) => b.likes - a.likes))
-  }, [blogs])
   
-
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -59,6 +54,7 @@ const App = () => {
       const returnedBlog = await blogService.create(formData)
       setBlogs(blogs.concat(returnedBlog))
       notificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`, 'success')
+      //TODO! after create a blog and press the view button I do not see user and delete button. I have to refresh whole page.
     } catch (error) {
       notificationMessage(`Blog '${formData.title}' was not created!`, 'error')
     }
@@ -77,13 +73,24 @@ const App = () => {
 
   const blogUpdate = async (updatedBlog) => {
     try {
-      const { user, ...blogData } = updatedBlog; // Destructure user object and keep only blog data
+      const { user, ...blogData } = updatedBlog
       const respondedBlog = await blogService.update(blogData.id, blogData)
-      setBlogs(blogs.map(b => b.id !== respondedBlog.id ? b : { ...respondedBlog, user }))//TODO! here we can return user object from server by populate method in blogs.put method 
+      setBlogs(blogs.map(b => b.id !== respondedBlog.id ? b : respondedBlog))
       notificationMessage(`A new blog ${ respondedBlog.title } by ${ respondedBlog.author } updated!`, 'success')
     } catch (error) {
       notificationMessage(`Blog '${ blogData.title }' was not updated!`, 'error')
     }
+  }
+
+  const deleteBlog = async (id, title) => {
+    try {
+      await blogService.remove(id)
+      notificationMessage(`Deleted ${title}`, 'success')
+    } catch (error) {
+      notificationMessage(`The blog was not deleted from server.`, 'error')
+      if (error.response.status == 401) handleLogout()
+    }
+    setBlogs(blogs.filter(b => b.id !== id))
   }
 
   return (
@@ -107,7 +114,7 @@ const App = () => {
         </div>
       }
       <h1>blogs</h1>
-      { blogs.map(blog => <Blog key={ blog.id } blog={ blog } blogUpdate={ blogUpdate }/>) }
+      { blogs.map(blog => <Blog key={ blog.id } blog={ blog } blogUpdate={ blogUpdate } user={ user } onDelete={deleteBlog}/>) }
     </div>
   )
 }

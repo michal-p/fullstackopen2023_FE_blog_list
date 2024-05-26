@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
-const Blog = ({ blog, blogUpdate }) => {
-  const [view, setView] = useState(false)
+const Blog = ({ blog, blogUpdate, user, onDelete }) => {
+  const [viewDetails, setViewDetails] = useState(false)
 
   const blogStyle = {
     paddingTop: 10,
@@ -12,11 +12,22 @@ const Blog = ({ blog, blogUpdate }) => {
   }
 
   const handleView = () => {
-    setView(!view)
+    setViewDetails(!viewDetails)
   }
 
   const handleLikes = () => {
     blogUpdate({ ...blog, likes: blog.likes + 1 })
+  }
+
+const handleDelete = () => {
+  const isConfirmed = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
+  if (isConfirmed) {
+    onDelete(blog.id, blog.title)
+  }
+}
+
+  const showWhenUserOwnsBlog = {
+    display: user && blog.user && blog.user.id === user.id ? '' : 'none'
   }
 
   return (
@@ -24,10 +35,10 @@ const Blog = ({ blog, blogUpdate }) => {
       <div>
         { blog.title } { blog.author } 
         <button onClick={ handleView }>
-          { view ? 'hide' : 'view' }
+          { viewDetails ? 'hide' : 'view' }
         </button>
       </div>
-      { view && (
+      { viewDetails && (
         <>
           <div>{ blog.url }</div>
           <div>
@@ -35,6 +46,7 @@ const Blog = ({ blog, blogUpdate }) => {
             <button onClick={handleLikes}>likes</button>
           </div>
           <div>{ blog.user && blog.user.username }</div>
+          <button style={ showWhenUserOwnsBlog } onClick={ handleDelete }>Delete</button>
         </>
       ) }
     </div>  
