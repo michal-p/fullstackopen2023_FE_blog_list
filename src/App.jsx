@@ -10,8 +10,6 @@ import './index.css'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const [typeMessage, setTypeMessage] = useState(null)
@@ -33,16 +31,12 @@ const App = () => {
     }
   }, []) // This effect runs only once after the initial render, setting up the user from local storage if available.
   
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
+  const handleLogin = async (loginObject) => {
     try {
-      const user = await loginService.login({ username, password })
+      const user = await loginService.login(loginObject)
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user)) 
       blogService.setToken(user.token)
       setUser(user)
-      setUsername('')
-      setPassword('')
       notificationMessage('Successfully logged in!', 'success')
     } catch (exception) {
       notificationMessage('Wrong credentials!', 'error')
@@ -54,7 +48,6 @@ const App = () => {
       const returnedBlog = await blogService.create(formData)
       setBlogs(blogs.concat(returnedBlog))
       notificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`, 'success')
-      //TODO! after create a blog and press the view button I do not see user and delete button. I have to refresh whole page.
     } catch (error) {
       notificationMessage(`Blog '${formData.title}' was not created!`, 'error')
     }
@@ -96,22 +89,18 @@ const App = () => {
   return (
     <div>
       <NotificationMessage message={errorMessage} typeMessage={typeMessage} />
-      {user === null ?
-        <Login 
-          password={password}
-          username={username}
-          handleLogin={handleLogin}
-          setPassword={setPassword}
-          setUsername={setUsername}
-        /> :
-        <div>
-          <p>{user.name} logged-in</p>
-          <button onClick={handleLogout}>Logout</button>
-          <h2>Create blog</h2>
-          <Togglable buttonLabel='Create blog' ref={blogFormRef}>
-            <BlogCreateForm addNewBlog={addBlog} />
-          </Togglable>
-        </div>
+      { user === null 
+        ?
+          <Login handleLogin={handleLogin}/>
+        :
+          <div>
+            <p>{user.name} logged-in</p>
+            <button onClick={handleLogout}>Logout</button>
+            <h2>Create blog</h2>
+            <Togglable buttonLabel='Create blog' ref={blogFormRef}>
+              <BlogCreateForm addNewBlog={addBlog} />
+            </Togglable>
+          </div>
       }
       <h1>blogs</h1>
       { blogs.map(blog => <Blog key={ blog.id } blog={ blog } blogUpdate={ blogUpdate } user={ user } onDelete={deleteBlog}/>) }
