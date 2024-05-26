@@ -19,7 +19,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs.sort((a, b) => b.likes - a.likes))
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -45,11 +45,13 @@ const App = () => {
 
   const addBlog = async (formData) => {
     try {
+      blogFormRef.current.toggleVisibility()
       const returnedBlog = await blogService.create(formData)
       setBlogs(blogs.concat(returnedBlog))
       notificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`, 'success')
     } catch (error) {
       notificationMessage(`Blog '${formData.title}' was not created!`, 'error')
+       if (error.response.status == 401) handleLogout()
     }
   }
 
@@ -72,6 +74,7 @@ const App = () => {
       notificationMessage(`A new blog ${ respondedBlog.title } by ${ respondedBlog.author } updated!`, 'success')
     } catch (error) {
       notificationMessage(`Blog '${ blogData.title }' was not updated!`, 'error')
+       if (error.response.status == 401) handleLogout()
     }
   }
 
