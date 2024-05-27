@@ -20,12 +20,12 @@ const Blog = ({ blog, blogUpdate, user, onDelete }) => {
     blogUpdate({ ...blog, likes: blog.likes + 1 })
   }
 
-const handleDelete = () => {
-  const isConfirmed = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
-  if (isConfirmed) {
-    onDelete(blog.id, blog.title)
+  const handleDelete = () => {
+    const isConfirmed = window.confirm(`Remove blog ${blog.title} by ${blog.author}`)
+    if (isConfirmed) {
+      onDelete(blog.id, blog.title)
+    }
   }
-}
 
   const showWhenUserOwnsBlog = {
     display: user && blog.user && blog.user.id === user.id ? '' : 'none'
@@ -34,7 +34,7 @@ const handleDelete = () => {
   return (
     <div style={ blogStyle } >
       <div>
-        { blog.title } { blog.author } 
+        { blog.title } { blog.author }
         <button onClick={ handleView }>
           { viewDetails ? 'hide' : 'view' }
         </button>
@@ -50,7 +50,7 @@ const handleDelete = () => {
           <button style={ showWhenUserOwnsBlog } onClick={ handleDelete }>Delete</button>
         </>
       ) }
-    </div>  
+    </div>
   )
 }
 

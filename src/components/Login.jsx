@@ -2,9 +2,9 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const Login = ({ handleLogin }) => {
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
-  
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
   const handleSubmit = event => {
     event.preventDefault()
     handleLogin({ username, password })
@@ -16,7 +16,7 @@ const Login = ({ handleLogin }) => {
     <form onSubmit={ handleSubmit }>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -25,7 +25,7 @@ const Login = ({ handleLogin }) => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -33,7 +33,7 @@ const Login = ({ handleLogin }) => {
         />
       </div>
       <button type="submit">login</button>
-    </form>      
+    </form>
   )
 }
 

@@ -30,11 +30,11 @@ const App = () => {
       blogService.setToken(loggedUser.token)
     }
   }, []) // This effect runs only once after the initial render, setting up the user from local storage if available.
-  
+
   const handleLogin = async (loginObject) => {
     try {
       const user = await loginService.login(loginObject)
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user)) 
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       notificationMessage('Successfully logged in!', 'success')
@@ -51,7 +51,7 @@ const App = () => {
       notificationMessage(`A new blog ${returnedBlog.title} by ${returnedBlog.author} added!`, 'success')
     } catch (error) {
       notificationMessage(`Blog '${formData.title}' was not created!`, 'error')
-       if (error.response.status == 401) handleLogout()
+      if (error.response.status === 401) handleLogout()
     }
   }
 
@@ -67,14 +67,14 @@ const App = () => {
   }
 
   const blogUpdate = async (updatedBlog) => {
+    const { user, ...blogData } = updatedBlog
     try {
-      const { user, ...blogData } = updatedBlog
       const respondedBlog = await blogService.update(blogData.id, blogData)
       setBlogs(blogs.map(b => b.id !== respondedBlog.id ? b : respondedBlog))
       notificationMessage(`A new blog ${ respondedBlog.title } by ${ respondedBlog.author } updated!`, 'success')
     } catch (error) {
-      notificationMessage(`Blog '${ blogData.title }' was not updated!`, 'error')
-       if (error.response.status == 401) handleLogout()
+      notificationMessage(`Blog ${ blogData.title } was not updated!`, 'error')
+      if (error.response.status === 401) handleLogout()
     }
   }
 
@@ -83,8 +83,8 @@ const App = () => {
       await blogService.remove(id)
       notificationMessage(`Deleted ${title}`, 'success')
     } catch (error) {
-      notificationMessage(`The blog was not deleted from server.`, 'error')
-      if (error.response.status == 401) handleLogout()
+      notificationMessage('The blog was not deleted from server.', 'error')
+      if (error.response.status === 401) handleLogout()
     }
     setBlogs(blogs.filter(b => b.id !== id))
   }
@@ -92,18 +92,18 @@ const App = () => {
   return (
     <div>
       <NotificationMessage message={errorMessage} typeMessage={typeMessage} />
-      { user === null 
+      { user === null
         ?
-          <Login handleLogin={handleLogin}/>
+        <Login handleLogin={handleLogin}/>
         :
-          <div>
-            <p>{user.name} logged-in</p>
-            <button onClick={handleLogout}>Logout</button>
-            <h2>Create blog</h2>
-            <Togglable buttonLabel='Create blog' ref={blogFormRef}>
-              <BlogCreateForm addNewBlog={addBlog} />
-            </Togglable>
-          </div>
+        <div>
+          <p>{user.name} logged-in</p>
+          <button onClick={handleLogout}>Logout</button>
+          <h2>Create blog</h2>
+          <Togglable buttonLabel='Create blog' ref={blogFormRef}>
+            <BlogCreateForm addNewBlog={addBlog} />
+          </Togglable>
+        </div>
       }
       <h1>blogs</h1>
       { blogs.map(blog => <Blog key={ blog.id } blog={ blog } blogUpdate={ blogUpdate } user={ user } onDelete={deleteBlog}/>) }
