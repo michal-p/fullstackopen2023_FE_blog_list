@@ -32,18 +32,16 @@ const Blog = ({ blog, blogUpdate, user, onDelete }) => {
   }
 
   return (
-    <div style={ blogStyle } >
+    <div style={ blogStyle } className='blog'>
       <div>
-        { blog.title } { blog.author }
-        <button onClick={ handleView }>
-          { viewDetails ? 'hide' : 'view' }
-        </button>
+        <span className='title'>{blog.title}</span> <span className='author'>{blog.author}</span>
+        <button onClick={ handleView }>{ viewDetails ? 'hide' : 'view' }</button>
       </div>
       { viewDetails && (
         <>
-          <div>{ blog.url }</div>
-          <div>
-            { blog.likes }
+          <div className='url'>{ blog.url }</div>
+          <div className='likes'>
+            <span className='count'>{blog.likes}</span>
             <button onClick={handleLikes}>likes</button>
           </div>
           <div>{ blog.user && blog.user.username }</div>
@@ -57,8 +55,7 @@ const Blog = ({ blog, blogUpdate, user, onDelete }) => {
 Blog.propTypes = {
   blogUpdate: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
-  blog: PropTypes.object.isRequired,
-  user: PropTypes.object.isRequired
+  blog: PropTypes.object.isRequired
 }
 
 export default Blog

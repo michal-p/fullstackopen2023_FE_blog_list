@@ -17,13 +17,13 @@ const AddBlog = ({ addNewBlog }) => {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        title: <input name="title" onChange={handleChange} value={formData.title}/>
+        title: <input data-testid='title' name="title" placeholder='title' onChange={handleChange} value={formData.title}/>
       </div>
       <div>
-        author: <input name="author" onChange={handleChange} value={formData.author}/>
+        author: <input data-testid='author' name="author" placeholder='author' onChange={handleChange} value={formData.author}/>
       </div>
       <div>
-        url: <input name="url" onChange={handleChange} value={formData.url}/>
+        url: <input data-testid='url' name="url" placeholder='url' onChange={handleChange} value={formData.url}/>
       </div>
       <div>
         <button type="submit">add</button>
